@@ -14,6 +14,7 @@ function App() {
     <div>
       <h1>{message}</h1>
       <h2>tescik</h2>
+      <h2>tescik2</h2>
     </div>
   );
 }
