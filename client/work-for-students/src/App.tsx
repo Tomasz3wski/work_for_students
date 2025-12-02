@@ -13,6 +13,8 @@ function App() {
   return (
     <div>
       <h1>{message}</h1>
+      <h2>tescik</h2>
+      <h2>tescik</h2>
     </div>
   );
 }
