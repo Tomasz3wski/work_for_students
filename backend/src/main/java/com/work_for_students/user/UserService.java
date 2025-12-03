@@ -1,5 +1,6 @@
 package com.work_for_students.user;
 
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,9 +34,10 @@ public class UserService {
         if(!isValidEmail(user.getEmail())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("niepoprawny format emaila");
         }
-        if(user.getRole()==UserRole.STUDENT || !checkIfStudent(user.getEmail())){
+        if(user.getRole()==UserRole.STUDENT && !checkIfStudent(user.getEmail())){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("w celu założenia konta studenckiego proszę o podanie emaila uczelnianego");
         }
+        user.setPassword(BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()));
         userRepository.save(user);
         return ResponseEntity.ok("Dodano");
     }
