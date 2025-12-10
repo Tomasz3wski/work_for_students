@@ -1,5 +1,6 @@
 import { useState, type FormEvent, type ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
+import { authService } from "../api/auth";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -10,27 +11,36 @@ export default function Register() {
     confirmPassword: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrorMessage(null);
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    
     if (formData.password !== formData.confirmPassword) {
-      alert("Hasła nie są identyczne!");
+      setErrorMessage("Hasła nie są identyczne!");
       return;
     }
 
     setIsSubmitting(true);
+    setErrorMessage(null);
 
-    // Symulacja rejestracji
-    setTimeout(() => {
-      setIsSubmitting(false);
-      alert("Konto założone! Możesz się teraz zalogować.");
+    try {
+      await authService.register(formData);
+      
+      alert("Konto założone pomyślnie! Możesz się zalogować.");
       navigate("/login");
-    }, 1000);
+      
+    } catch (error: any) {
+      setErrorMessage(error.message || "Nie udało się utworzyć konta.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -39,6 +49,12 @@ export default function Register() {
         <h2>Dołącz do nas</h2>
         <p className="auth-subtitle">Znajdź swoją pierwszą pracę już dziś.</p>
 
+        {errorMessage && (
+          <div style={{ color: '#dc2626', background: '#fee2e2', padding: '10px', borderRadius: '4px', marginBottom: '15px', fontSize: '0.9rem', textAlign: 'center' }}>
+            {errorMessage}
+          </div>
+        )}
+
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="fullName">Imię i Nazwisko</label>
@@ -46,7 +62,6 @@ export default function Register() {
               id="fullName"
               type="text"
               name="fullName"
-              placeholder="np. Jan Kowalski"
               className="input-field"
               value={formData.fullName}
               onChange={handleInputChange}
@@ -60,7 +75,6 @@ export default function Register() {
               id="email"
               type="email"
               name="email"
-              placeholder="np. jan@kowalski.pl"
               className="input-field"
               value={formData.email}
               onChange={handleInputChange}
@@ -88,7 +102,6 @@ export default function Register() {
               id="confirmPassword"
               type="password"
               name="confirmPassword"
-              placeholder="Powtórz hasło"
               className="input-field"
               value={formData.confirmPassword}
               onChange={handleInputChange}
