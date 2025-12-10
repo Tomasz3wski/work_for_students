@@ -16,7 +16,7 @@ export default function Navbar() {
 
 	const handleLogout = () => {
 		localStorage.removeItem("userToken");
-		window.location.reload(); // Najprostszy sposób na odświeżenie stanu aplikacji
+		window.location.reload();
 	};
 
 	return (
