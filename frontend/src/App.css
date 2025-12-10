@@ -1,42 +1,262 @@
+/* --- RESET I BAZA --- */
+html,
+body,
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+	margin: 0;
+	padding: 0;
+	height: 100%; /* Bezwzględnie 100% wysokości okna */
+	width: 100%;
+	overflow: hidden; /* Brak scrolla na poziomie okna przeglądarki */
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	background-color: #f3f2ef;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+/* --- APP SHELL (Główna rama) --- */
+.app-shell {
+	display: flex;
+	flex-direction: column;
+	height: 100vh; /* 100% wysokości viewportu */
+	width: 100vw;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* --- NAVBAR (Zawsze widoczny) --- */
+.navbar {
+	height: 60px;
+	min-height: 60px; /* Aby się nie zwężał */
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0 1.5rem;
+	background-color: white;
+	border-bottom: 1px solid #e0e0e0;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+	z-index: 100;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.nav-brand {
+	font-size: 1.4rem;
+	font-weight: 800;
+	color: #0a66c2;
+	cursor: pointer;
+	white-space: nowrap; /* Nie łam nazwy na małym ekranie */
 }
 
-.card {
-  padding: 2em;
+.nav-center-info {
+	font-size: 0.85rem;
+	color: #666;
+	display: flex;
+	gap: 5px;
 }
 
-.read-the-docs {
-  color: #888;
+.nav-buttons {
+	display: flex;
+	gap: 10px;
+}
+
+/* --- CONTENT AREA (Reszta ekranu) --- */
+.content-area {
+	flex: 1; /* Zajmuje całą przestrzeń pozostałą po navbarze */
+	overflow: hidden; /* Każda podstrona zarządza swoim scrollem */
+	position: relative;
+	width: 100%;
+}
+
+/* --- SPLIT VIEW (Widok Ofert) --- */
+.split-view {
+	display: flex;
+	height: 100%; /* Wypełnia content-area */
+	width: 100%;
+	max-width: 1600px; /* Ogranicznik dla ultra-szerokich ekranów */
+	margin: 0 auto;
+}
+
+/* Lista ofert */
+.list-pane {
+	width: 400px; /* Domyślna szerokość na desktopie */
+	flex-shrink: 0;
+	border-right: 1px solid #e0e0e0;
+	background: white;
+	overflow-y: auto; /* Scroll listy */
+}
+
+/* Szczegóły oferty */
+.details-pane {
+	flex: 1; /* Reszta szerokości */
+	background: white;
+	overflow-y: hidden; /* Scrollujemy wewnętrzny kontener */
+	display: flex;
+	flex-direction: column;
+}
+
+.details-scroll-container {
+	overflow-y: auto; /* Scroll szczegółów */
+	padding: 2rem 3rem;
+	height: 100%;
+	box-sizing: border-box;
+}
+
+/* --- STYLE ELEMENTÓW --- */
+.offer-item {
+	padding: 1.2rem;
+	border-bottom: 1px solid #f0f0f0;
+	cursor: pointer;
+	transition: background 0.2s;
+}
+.offer-item:hover {
+	background-color: #f8f9fa;
+}
+.offer-item.selected {
+	background-color: #eaf4fe;
+	border-left: 4px solid #0a66c2;
+	padding-left: calc(1.2rem - 4px);
+}
+.offer-title {
+	margin: 0 0 5px 0;
+	font-size: 1rem;
+	color: #0a66c2;
+}
+.offer-meta {
+	font-size: 0.8rem;
+	color: #666;
+}
+.salary-text {
+	color: #059669;
+	font-weight: 600;
+}
+
+.details-header h1 {
+	margin: 0 0 10px 0;
+	font-size: 1.8rem;
+}
+.details-sub {
+	color: #555;
+	margin-bottom: 1rem;
+}
+.salary-large {
+	font-size: 1.2rem;
+	color: #059669;
+	font-weight: bold;
+	margin-bottom: 1.5rem;
+}
+.action-buttons {
+	display: flex;
+	gap: 1rem;
+}
+.divider {
+	border: 0;
+	border-top: 1px solid #eee;
+	margin: 2rem 0;
+}
+.details-body {
+	line-height: 1.6;
+	color: #333;
+	max-width: 800px;
+}
+
+/* Przyciski */
+.btn {
+	border: none;
+	border-radius: 20px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: 0.2s;
+}
+.btn-sm {
+	padding: 6px 16px;
+	font-size: 0.85rem;
+}
+.btn-primary {
+	background: #0a66c2;
+	color: white;
+	padding: 10px 24px;
+}
+.btn-primary:hover {
+	background: #004182;
+}
+.btn-secondary {
+	background: transparent;
+	color: #0a66c2;
+	border: 1px solid #0a66c2;
+	padding: 10px 24px;
+}
+.btn-secondary:hover {
+	background: #eaf4fe;
+}
+.status-ok {
+	color: #059669;
+	font-weight: bold;
+}
+.status-error {
+	color: #dc2626;
+	font-weight: bold;
+}
+
+/* --- LOGIN PAGE STYLES --- */
+/* Ważne: Login korzysta teraz z content-area, więc centrujemy go flexem */
+.auth-page-wrapper {
+	height: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background-color: #f3f2ef;
+}
+.auth-container {
+	background: white;
+	padding: 2rem;
+	width: 100%;
+	max-width: 380px;
+	border-radius: 8px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+.input-field {
+	width: 100%;
+	padding: 10px;
+	margin-bottom: 10px;
+	box-sizing: border-box;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+}
+.btn-full {
+	width: 100%;
+	margin-top: 10px;
+}
+
+/* --- RESPONSYWNOŚĆ (MEDIA QUERIES) --- */
+
+/* Tablet i mniejsze (poniżej 900px) */
+@media (max-width: 900px) {
+	.details-scroll-container {
+		padding: 1.5rem;
+	}
+	.list-pane {
+		width: 320px;
+	}
+}
+
+/* Mobile (poniżej 700px) - Tryb "Tylko lista" lub skompresowany */
+@media (max-width: 700px) {
+	.nav-center-info {
+		display: none;
+	} /* Ukrywamy status serwera na małym telefonie */
+	.nav-brand {
+		font-size: 1.1rem;
+	}
+	.navbar {
+		padding: 0 1rem;
+	}
+
+	/* Na mobile, normalnie robi się nawigację. 
+     Dla zachowania "jednego ekranu" zrobimy tak:
+     Lista zajmuje 100%, Szczegóły ukryte (chyba że dodasz logikę przełączania).
+     W tym demo: Lista ma priorytet.
+  */
+	.list-pane {
+		width: 100%;
+		border-right: none;
+	}
+	.details-pane {
+		display: none;
+	}
+
+	/* Opcjonalnie: Jeśli chcesz widzieć szczegóły, musiałbyś dodać przycisk "Wróć" w JS */
 }
