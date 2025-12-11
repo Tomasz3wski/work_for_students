@@ -12,9 +12,9 @@ public class UserConfig {
     CommandLineRunner userCommandLineRunner(UserRepository repository) {
 
         return args -> {
-            User user1 = new User("log1", BCrypt.hashpw("pass1", BCrypt.gensalt()), UserRole.ADMIN, "bartek@szef.com");
-            User user2 = new User("log2", BCrypt.hashpw("pass2", BCrypt.gensalt()), UserRole.EMPLOYER, "zlodziej@reply.pl");
-            User user3 = new User("log3", BCrypt.hashpw("pass3", BCrypt.gensalt()), UserRole.STUDENT, "adas@student.polsl");
+            User user1 = new User(BCrypt.hashpw("pass1", BCrypt.gensalt()), UserRole.ADMIN, "bartek@szef.com", "Bartek B");
+            User user2 = new User(BCrypt.hashpw("pass2", BCrypt.gensalt()), UserRole.EMPLOYER, "zlodziej@reply.pl", "wiadomo kto");
+            User user3 = new User(BCrypt.hashpw("pass3", BCrypt.gensalt()), UserRole.STUDENT, "adas@student.polsl", "zbigniew kucharski");
 
             repository.save(user1);
             repository.save(user2);
