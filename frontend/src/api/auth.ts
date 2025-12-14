@@ -26,7 +26,9 @@ export const authService = {
       throw new Error(errorData.message || "Błąd logowania. Sprawdź dane.");
     }
 
-    return response.json();
+    const rawTokenString = await response.text(); 
+
+    return { token: rawTokenString };
   },
 
   // --- REJESTRACJA ---
