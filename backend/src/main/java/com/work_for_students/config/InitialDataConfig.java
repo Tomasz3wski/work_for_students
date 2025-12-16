@@ -41,7 +41,7 @@ public class InitialDataConfig {
                     "Prywatna opieka medyczna, karta Multisport",
                     OfferType.B2B,
                     true,
-                    requirementsOffer1, // Używamy listy
+                    requirementsOffer1,
                     Arrays.asList("Umiejętność picia kawy", "Chęć nauki"),
                     "Kraków",
                     "Junior Java/React Dev"
@@ -54,8 +54,8 @@ public class InitialDataConfig {
                     "Owocowe czwartki",
                     OfferType.Freelance,
                     false,
-                    requirementsOffer2, // Używamy drugiej listy
-                    Arrays.asList("umiejetnosc ciecia"),
+                    requirementsOffer2,
+                    Arrays.asList("umiejetnosc cięcia"),
                     "Gliwice",
                     "Intern Fullstack Developer"
             );
