@@ -1,42 +1,343 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+/* =========================================
+   1. GLOBAL RESET & BASE STYLES
+   ========================================= */
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%;       /* Wymusza pełną wysokość okna */
+  width: 100%;
+  overflow: hidden;   /* Blokuje scrollowanie głównego okna przeglądarki */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: #f3f2ef; /* Jasnoszare tło (styl LinkedIn) */
+  color: #333;        /* Domyślny ciemny kolor tekstu */
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+/* =========================================
+   2. APP SHELL (GŁÓWNY UKŁAD)
+   ========================================= */
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;      /* 100% wysokości viewportu */
+  width: 100vw;
+}
+
+/* =========================================
+   3. NAVBAR (Zawsze widoczny na górze)
+   ========================================= */
+.navbar {
+  height: 60px;
+  min-height: 60px;   /* Zapobiega zgniataniu */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1.5rem;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  z-index: 100;       /* Zawsze na wierzchu */
+}
+
+.nav-brand {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #0a66c2;     /* Brand Blue */
+  cursor: pointer;
+  white-space: nowrap;
+  letter-spacing: -0.5px;
+}
+
+.nav-center-info {
+  font-size: 0.85rem;
+  color: #666;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+/* Statusy połączenia */
+.status-ok { color: #059669; font-weight: 600; }
+.status-error { color: #dc2626; font-weight: 600; }
+
+/* =========================================
+   4. CONTENT AREA (Obszar roboczy)
+   ========================================= */
+.content-area {
+  flex: 1;            /* Zajmuje całą przestrzeń pod navbarem */
+  overflow: hidden;   /* Ważne: to tutaj blokujemy wyciekanie treści */
+  position: relative;
+  width: 100%;
+  display: flex;      /* Aby dzieci mogły korzystać z flexa (np. split-view) */
+  flex-direction: column;
+}
+
+/* =========================================
+   5. SPLIT VIEW (STRONA GŁÓWNA / OFERTY)
+   ========================================= */
+.split-view {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  max-width: 1600px;  /* Ograniczenie dla bardzo szerokich monitorów */
+  margin: 0 auto;     /* Centrowanie kontenera */
+}
+
+/* LEWY PANEL: Lista ofert */
+.list-pane {
+  width: 400px;       /* Stała szerokość */
+  flex-shrink: 0;     /* Nie zwęża się */
+  border-right: 1px solid #e0e0e0;
+  background: #ffffff;
+  overflow-y: auto;   /* Scrolluje się niezależnie */
+}
+
+/* PRAWY PANEL: Szczegóły */
+.details-pane {
+  flex: 1;            /* Zajmuje resztę miejsca */
+  background: #ffffff;
+  overflow-y: hidden; /* Kontener nie scrolluje, scrolluje jego dziecko */
+  display: flex;
+  flex-direction: column;
+}
+
+.details-scroll-container {
+  overflow-y: auto;   /* Tutaj jest scroll treści szczegółów */
+  padding: 2rem 3rem;
+  height: 100%;
+}
+
+/* Stylizacja elementów listy */
+.offer-item {
+  padding: 1.2rem;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.offer-item:hover {
+  background-color: #f8f9fa;
+}
+
+.offer-item.selected {
+  background-color: #eaf4fe; /* Jasnoniebieskie tło aktywnego */
+  border-left: 4px solid #0a66c2;
+  padding-left: calc(1.2rem - 4px); /* Korekta paddingu */
+}
+
+.offer-title {
+  margin: 0 0 5px 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #0a66c2;
+}
+
+.offer-company {
+  margin: 0 0 4px 0;
+  font-weight: 500;
+  color: #111;
+}
+
+.offer-meta {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.salary-text {
+  color: #059669; /* Zielony dla pieniędzy */
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+/* Stylizacja szczegółów */
+.details-header h1 { margin: 0 0 10px 0; font-size: 1.8rem; color: #222; }
+.details-sub { color: #555; margin-bottom: 1rem; font-size: 1rem; }
+.salary-large { font-size: 1.2rem; color: #059669; font-weight: bold; margin-bottom: 1.5rem; }
+
+.action-buttons { display: flex; gap: 1rem; margin-bottom: 1rem; }
+.divider { border: 0; border-top: 1px solid #eee; margin: 2rem 0; }
+
+.details-body h3 { font-size: 1.1rem; color: #222; margin-top: 1.5rem; }
+.details-body p, .details-body li { line-height: 1.6; color: #444; }
+.empty-state { padding: 3rem; text-align: center; color: #888; font-size: 1.1rem; }
+
+/* =========================================
+   6. AUTH PAGES (LOGIN / REGISTER)
+   ========================================= */
+.auth-page-wrapper {
+  flex: 1;            /* Wypełnia content-area */
+  display: flex;
+  justify-content: center;
+  align-items: center; /* Centrowanie pionowe */
+  background-color: #f3f2ef;
+  padding: 20px;
+}
+
+.auth-card {
+  background-color: #ffffff;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 400px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-card h2 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.8rem;
+  color: #202124;
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.auth-subtitle {
+  text-align: center;
+  color: #666;
+  margin: 0 0 2rem 0;
+  font-size: 0.95rem;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  gap: 0.4rem;
+}
+
+.form-group label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #444;
+}
+
+/* NAPRAWA INPUTÓW: Białe tło, czarny tekst */
+.input-field {
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 1rem;
+  background-color: #ffffff !important; /* Wymuszenie bieli */
+  color: #000000 !important;          /* Wymuszenie czerni */
+  width: 100%;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: #0a66c2;
+  box-shadow: 0 0 0 3px rgba(10, 102, 194, 0.1);
+}
+
+.input-field::placeholder {
+  color: #9ca3af;
+}
+
+.auth-footer {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* =========================================
+   7. BUTTONS & UTILS
+   ========================================= */
+.btn {
+  border: none;
+  border-radius: 24px; /* Zaokrąglone przyciski */
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-sm { padding: 6px 16px; font-size: 0.9rem; }
+.btn-full { width: 100%; padding: 12px; margin-top: 0.5rem; }
+
+.btn-primary {
+  background-color: #0a66c2;
+  color: #ffffff;
+}
+.btn-primary:hover {
+  background-color: #004182;
+}
+.btn-primary:disabled {
+  background-color: #90bceb;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: #0a66c2;
+  border: 1px solid #0a66c2;
+}
+.btn-secondary:hover {
+  background-color: #eaf4fe;
+  box-shadow: inset 0 0 0 1px #0a66c2; /* Pogrubienie obramowania */
+}
+
+.link {
+  color: #0a66c2;
+  font-weight: 600;
+  cursor: pointer;
+}
+.link:hover { text-decoration: underline; }
+
+/* =========================================
+   8. MEDIA QUERIES (Responsywność)
+   ========================================= */
+
+/* Tablet i mniejsze laptopy */
+@media (max-width: 900px) {
+  .details-scroll-container { padding: 1.5rem; }
+  .list-pane { width: 320px; }
+}
+
+/* Telefony (Mobile) */
+@media (max-width: 700px) {
+  .navbar { padding: 0 1rem; }
+  .nav-center-info { display: none; } /* Ukrywamy status na małym ekranie */
+  .nav-brand { font-size: 1.2rem; }
+  
+  /* Układ jednokolumnowy */
+  .list-pane { 
+    width: 100%; 
+    border-right: none; 
   }
-  to {
-    transform: rotate(360deg);
+  
+  /* Domyślnie ukrywamy szczegóły na mobile (widoczna tylko lista) */
+  .details-pane { 
+    display: none; 
   }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+  
+  .auth-card {
+    padding: 1.5rem;
+    box-shadow: none; /* Na mobile często usuwa się cień dla płaskiego wyglądu */
+    background: transparent;
   }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
+  
+  .auth-page-wrapper {
+    background: #fff; /* Na mobile formularz na pełnym białym tle */
+    align-items: flex-start; /* Formularz od góry */
+    padding-top: 40px;
+  }
 }
