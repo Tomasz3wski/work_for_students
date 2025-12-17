@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/auth") // Bazowa ścieżka: /api/auth
+@RequestMapping("/api/auth")
 public class AuthController {
 
     private final AuthService authService;
@@ -23,7 +23,6 @@ public class AuthController {
         return authService.registerUser(request);
     }
 
-    // --- POST /api/auth/login ---
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody AuthRequest request) {
         return authService.login(request.getEmail(), request.getPassword());

@@ -1,43 +1,44 @@
 package com.work_for_students.auth;
 
-
-
 import com.work_for_students.auth.dto.RegisterRequest;
 import com.work_for_students.user.User;
 import com.work_for_students.user.UserRepository;
 import com.work_for_students.user.UserRole;
 import com.work_for_students.user.UserService;
-import org.mindrot.jbcrypt.BCrypt; // Importujemy bibliotekę, której używasz
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class AuthService {
 
     private final UserRepository userRepository;
     private final UserService userService;
+    private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public AuthService(UserRepository userRepository, UserService userService) {
+    public AuthService(UserRepository userRepository, UserService userService, JwtService jwtService, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userService = userService;
+        this.jwtService = jwtService;
+        this.authenticationManager = authenticationManager;
+        this.passwordEncoder = passwordEncoder;
     }
 
     // --- REJESTRACJA ---
     public ResponseEntity<String> registerUser(RegisterRequest request) {
 
-        // Haszowanie hasła
-        String salt = BCrypt.gensalt();
-        String hashedPassword = BCrypt.hashpw(request.getPassword(), salt);
-
-        // Tworzenie nowej encji
         User newUser = new User();
         newUser.setEmail(request.getEmail());
-        newUser.setPassword(hashedPassword); // Zapisujemy zahaszowane hasło
+        newUser.setPassword(passwordEncoder.encode(request.getPassword()));
         newUser.setFullName(request.getFullName());
         newUser.setRole(UserRole.STUDENT); //TODO front nie wysyla roli w body, zmienic na request.getRole pozniej
 
@@ -46,23 +47,20 @@ public class AuthService {
 
     // --- LOGOWANIE ---
     public ResponseEntity<String> login(String email, String rawPassword) {
-        Optional<User> userOptional = userRepository.findByEmail(email);
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(email, rawPassword)
+            );
 
-        // 1. Sprawdzenie istnienia użytkownika
-        if (userOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Błędny email lub hasło.");
+            var user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+            String jwtToken = jwtService.generateToken(user);
+
+            return ResponseEntity.ok(jwtToken);
+
+        } catch (AuthenticationException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Błędny email lub hasło.");
         }
-
-        User user = userOptional.get();
-
-        // 2. Weryfikacja hasła za pomocą BCrypt
-        boolean passwordMatches = BCrypt.checkpw(rawPassword, user.getPassword());
-
-        if (!passwordMatches) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Błędny email lub hasło.");
-        }
-
-        // 3. Zwracamy token
-        return ResponseEntity.ok("token-dla-" + user.getEmail());
     }
 }

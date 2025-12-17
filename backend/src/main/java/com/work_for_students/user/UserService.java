@@ -34,7 +34,6 @@ public class UserService {
         if(user.getRole()==UserRole.STUDENT && !checkIfStudent(user.getEmail())){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("w celu założenia konta studenckiego proszę o podanie emaila uczelnianego");
         }
-        user.setPassword(BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()));
         userRepository.save(user);
         return ResponseEntity.ok("Dodano");
     }
