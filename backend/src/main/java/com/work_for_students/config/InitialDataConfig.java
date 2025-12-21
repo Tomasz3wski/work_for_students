@@ -25,14 +25,20 @@ public class InitialDataConfig {
             Requirement req1 = new Requirement("Java");
             Requirement req2 = new Requirement("React");
             Requirement req3 = new Requirement("Postgres");
-            requirementRepository.saveAll(Arrays.asList(req1, req2, req3));
+            Requirement req4 = new Requirement("Linux");
+            Requirement req5 = new Requirement("Windows");
+            Requirement req6 = new Requirement("Git");
+            Requirement req7 = new Requirement("Responsibility");
+            Requirement req8 = new Requirement("SQL");
+            Requirement req9 = new Requirement("C/C++");
+            requirementRepository.saveAll(Arrays.asList(req1, req2, req3, req4, req5, req6, req7, req8, req9));
 
+            List<Requirement> requirementsOffer1 = Arrays.asList(req1, req2, req7);
 
-            // Lista wymagań dla pierwszej oferty
-            List<Requirement> requirementsOffer1 = Arrays.asList(req1, req2);
-
-            // Lista wymagań dla drugiej oferty
             List<Requirement> requirementsOffer2 = Arrays.asList(req2, req3);
+            List<Requirement> requirementsOffer3 = Arrays.asList(req9, req7, req4);
+            List<Requirement> requirementsOffer4 = Arrays.asList(req6, req8);
+
 
             // --- OFERTA 1 ---
             Offer offer1 = new Offer(
@@ -60,8 +66,34 @@ public class InitialDataConfig {
                     "Intern Fullstack Developer"
             );
 
+            // --- OFERTA 3 ---
+            Offer offer3 = new Offer(
+                    "6000 - 9500 PLN",
+                    "jakis dlugi opis stanowiska",
+                    "Owocowe czwartki",
+                    OfferType.Freelance,
+                    false,
+                    requirementsOffer3,
+                    Arrays.asList("pomyslowosc"),
+                    "Katowice",
+                    "Embedded Engineer Intern"
+            );
 
-            offerRepository.saveAll(Arrays.asList(offer1, offer2));
+            // --- OFERTA 4 ---
+            Offer offer4 = new Offer(
+                    "12000 - 16000 PLN",
+                    "jakis dlugi opis stanowiska",
+                    "Owocowe czwartki",
+                    OfferType.Contract_of_Employement,
+                    true,
+                    requirementsOffer4,
+                    Arrays.asList("wytrwalosc"),
+                    "Katowice",
+                    "Senior Data Engineer"
+            );
+
+
+            offerRepository.saveAll(Arrays.asList(offer1, offer2, offer3, offer4));
         };
     }
 }

@@ -6,6 +6,9 @@ import org.springframework.context.annotation.Configuration;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.util.Arrays;
+import java.util.List;
+
 @Configuration
 public class UserConfig {
 
@@ -16,10 +19,9 @@ public class UserConfig {
             User user1 = new User(passwordEncoder.encode("pass1"), UserRole.ADMIN, "bartek@szef.com", "Bartek B");
             User user2 = new User(passwordEncoder.encode("pass2"), UserRole.EMPLOYER, "zlodziej@reply.pl", "wiadomo kto");
             User user3 = new User(passwordEncoder.encode("pass3"), UserRole.STUDENT, "adas@student.polsl", "zbigniew kucharski");
+            User user4 = new User(passwordEncoder.encode("pass4"), UserRole.STUDENT, "stefan@student.polsl", "Stefan Burczymucha");
 
-            repository.save(user1);
-            repository.save(user2);
-            repository.save(user3);
+            repository.saveAll(Arrays.asList(user1, user2, user3, user4));
         };
     }
 }
