@@ -20,18 +20,20 @@ public class User implements UserDetails {
     @SequenceGenerator(name = "user_seq", sequenceName = "user_seq", allocationSize = 1)
     private Long id;
     private String password;
-    private String fullName;
+    private String name;
+    private String surname;
     private UserRole role;
     private String email;
 
     public User() {
     }
 
-    public User(String password, UserRole role, String email, String fullName) {
+    public User(String password, UserRole role, String email, String name, String surname) {
         this.password = password;
         this.role = role;
         this.email = email;
-        this.fullName = fullName;
+        this.name = name;
+        this.surname = surname;
     }
 
     @Override

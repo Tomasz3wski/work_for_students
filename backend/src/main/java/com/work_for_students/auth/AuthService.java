@@ -39,8 +39,9 @@ public class AuthService {
         User newUser = new User();
         newUser.setEmail(request.getEmail());
         newUser.setPassword(passwordEncoder.encode(request.getPassword()));
-        newUser.setFullName(request.getFullName());
-        newUser.setRole(UserRole.STUDENT); //TODO front nie wysyla roli w body, zmienic na request.getRole pozniej
+        newUser.setName(request.getName());
+        newUser.setSurname(request.getSurname());
+        newUser.setRole(request.getUserRole());
 
         return userService.addNewUser(newUser);
     }

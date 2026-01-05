@@ -3,9 +3,9 @@ import { type AuthCredentials } from "../types";
 const API_URL = "http://localhost:8080/api/auth";
 
 export interface RegisterData extends AuthCredentials {
-	role: string;
-	firstName?: string;
-	lastName?: string;
+	userRole: string;
+	name?: string;
+	surname?: string;
 	companyName?: string;
 	nip?: string;
 }

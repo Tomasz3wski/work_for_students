@@ -13,9 +13,9 @@ public class UserConfig {
     CommandLineRunner userCommandLineRunner(UserRepository repository, BCryptPasswordEncoder passwordEncoder) {
 
         return args -> {
-            User user1 = new User(passwordEncoder.encode("pass1"), UserRole.ADMIN, "bartek@szef.com", "Bartek B");
-            User user2 = new User(passwordEncoder.encode("pass2"), UserRole.EMPLOYER, "zlodziej@reply.pl", "wiadomo kto");
-            User user3 = new User(passwordEncoder.encode("pass3"), UserRole.STUDENT, "adas@student.polsl", "zbigniew kucharski");
+            User user1 = new User(passwordEncoder.encode("pass1"), UserRole.ADMIN, "bartek@szef.com", "Bartek", "B");
+            User user2 = new User(passwordEncoder.encode("pass2"), UserRole.EMPLOYER, "zlodziej@reply.pl", "wiadomo", "kto");
+            User user3 = new User(passwordEncoder.encode("pass3"), UserRole.STUDENT, "adas@student.polsl", "zbigniew", "kucharski");
 
             repository.save(user1);
             repository.save(user2);
