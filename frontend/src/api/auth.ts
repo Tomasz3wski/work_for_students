@@ -1,52 +1,52 @@
 import { type AuthCredentials } from "../types";
 
-const API_URL = "http://localhost:8080/api/auth"; 
+const API_URL = "http://localhost:8080/api/auth";
 
 export interface RegisterData extends AuthCredentials {
-  fullName: string;
+	role: string;
+	firstName?: string;
+	lastName?: string;
+	companyName?: string;
+	nip?: string;
 }
 
 interface AuthResponse {
-  token: string;
-  
+	token: string;
 }
 
 export const authService = {
-  login: async (credentials: AuthCredentials): Promise<AuthResponse> => {
-    const response = await fetch(`${API_URL}/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(credentials),
-    });
+	login: async (credentials: AuthCredentials): Promise<AuthResponse> => {
+		const response = await fetch(`${API_URL}/login`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(credentials),
+		});
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || "Błąd logowania. Sprawdź dane.");
-    }
+		if (!response.ok) {
+			const errorData = await response.json().catch(() => ({}));
+			throw new Error(errorData.message || "Błąd logowania. Sprawdź dane.");
+		}
 
-    return response.json();
-  },
+		return response.json();
+	},
 
-  // --- REJESTRACJA ---
-  register: async (data: RegisterData): Promise<void> => {
-    // @ts-ignore - ignorujemy fakt, że w data może być confirmPassword z formularza
-    const { confirmPassword, ...requestData } = data;
+	// --- REJESTRACJA ---
+	register: async (data: RegisterData): Promise<void> => {
+		// @ts-ignore
+		const { confirmPassword, ...requestData } = data;
 
-    const response = await fetch(`${API_URL}/register`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(requestData),
-    });
+		const response = await fetch(`${API_URL}/register`, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(requestData),
+		});
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || "Błąd rejestracji. Spróbuj ponownie.");
-    }
-    
-    return; 
-  },
+		if (!response.ok) {
+			const errorData = await response.json().catch(() => ({}));
+			throw new Error(errorData.message || "Błąd rejestracji.");
+		}
+		return;
+	},
 };
