@@ -24,18 +24,31 @@ public class User implements UserDetails {
     private String surname;
     private UserRole role;
     private String email;
+    private String company;
+    private String nip;
 
     public User() {
     }
 
-    public User(String password, UserRole role, String email, String name, String surname) {
+    public User(String password,  String email, UserRole role) {
         this.password = password;
-        this.role = role;
         this.email = email;
-        this.name = name;
-        this.surname = surname;
+        this.role = role;
     }
 
+    public static User createStudent(String email, String password, String name, String surname) {
+        User user = new User(password, email, UserRole.STUDENT);
+        user.setName(name);
+        user.setSurname(surname);
+        return user;
+    }
+
+    public static User createEmployer(String email, String password, String companyName, String nip) {
+        User user = new User(password, email, UserRole.EMPLOYER);
+        user.setCompany(companyName);
+        user.setNip(nip);
+        return user;
+    }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
