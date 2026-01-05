@@ -25,9 +25,6 @@ public class UserService {
     }
 
     public ResponseEntity<String> addNewUser(User user) {
-        if(userRepository.existsByLogin(user.getLogin())){
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Podany login jest zajęty");
-        }
         if(userRepository.existsByEmail(user.getEmail())){
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Istnieje użytkownik z podanym mailem");
         }
