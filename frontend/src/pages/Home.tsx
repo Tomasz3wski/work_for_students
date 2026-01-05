@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 // @ts-ignore
-import { testConnection } from "../api/client";
 import { offersService } from "../api/offers";
 import type { JobOffer } from "../types";
 
