@@ -1,9 +1,13 @@
 package com.work_for_students.offer;
 
+import com.work_for_students.offer.dto.OfferRequest;
+import com.work_for_students.user.User;
+import com.work_for_students.user.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,10 +16,12 @@ import java.util.Optional;
 @Service
 public class OfferService {
     private final OfferRepository offerRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public OfferService(OfferRepository offerRepository) {
+    public OfferService(OfferRepository offerRepository, UserRepository userRepository) {
         this.offerRepository = offerRepository;
+        this.userRepository = userRepository;
     }
 
     public List<Offer> getAll() {
@@ -30,5 +36,33 @@ public class OfferService {
         }
 
         return ResponseEntity.ok(offerOptional.get());
+    }
+
+    ResponseEntity<?> saveNewOffer(OfferRequest request, String userEmail) {
+        Optional<User> userOptional = userRepository.findByEmail(userEmail);
+
+        if (userOptional.isEmpty()) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("Błąd: Nie odnaleziono pracodawcy przypisanego do tego tokenu.");
+        }
+        User user = userOptional.get();
+
+        Offer offer = new Offer();
+        offer.setTitle(request.getTitle());
+        offer.setLocation(request.getLocation());
+        offer.setSalary(request.getSalary());
+        offer.setDescription(request.getDescription());
+        offer.setBenefits(request.getBenefits());
+        offer.setContractType(request.getContractType());
+        offer.setRemoteWork(request.getRemoteWork());
+        offer.setGlobalRequirements(request.getGlobalRequirements());
+        offer.setCustomRequirements(request.getCustomRequirements());
+        offer.setCompany(user.getCompany());
+
+        offerRepository.save(offer);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body("Oferta firmy została pomyślnie utworzona." + user.getCompany() + " " +user.getEmail());
     }
 }
