@@ -26,6 +26,7 @@ public class User implements UserDetails {
     private String email;
     private String company;
     private String nip;
+    private String cvLink;
 
     public User() {
     }

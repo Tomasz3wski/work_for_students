@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.function.EntityResponse;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 @Service
@@ -45,5 +46,26 @@ public class UserService {
     private boolean isValidEmail(String email) {
         String regex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
         return Pattern.matches(regex, email);
+    }
+
+    public ResponseEntity<?> updateUser(User user) {
+
+        Optional<User> optionalUser = userRepository.findById(user.getId());
+        if (optionalUser.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Błąd: Nie znaleziono użytkownika o ID: " + user.getId());
+        }
+        User newUser = optionalUser.get();
+        if(user.getRole() == UserRole.STUDENT) {
+            newUser.setName(user.getName());
+            newUser.setSurname(user.getSurname());
+            newUser.setCvLink(user.getCvLink());
+
+        }else if(user.getRole() == UserRole.EMPLOYER) {
+            newUser.setCompany(user.getCompany());
+            newUser.setNip(user.getNip());
+        }
+        userRepository.save(newUser);
+        return ResponseEntity.ok("Updated");
     }
 }
