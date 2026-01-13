@@ -3,9 +3,9 @@ import { type AuthCredentials } from "../types";
 const API_URL = "http://localhost:8080/api/auth";
 
 export interface RegisterData extends AuthCredentials {
-	role: string;
-	firstName?: string;
-	lastName?: string;
+	userRole: string;
+	name?: string;
+	surname?: string;
 	companyName?: string;
 	nip?: string;
 }
@@ -16,20 +16,20 @@ interface AuthResponse {
 
 export const authService = {
 	login: async (credentials: AuthCredentials): Promise<AuthResponse> => {
-		const response = await fetch(`${API_URL}/login`, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify(credentials),
-		});
+    const response = await fetch(`${API_URL}/login`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(credentials),
+    });
 
-		if (!response.ok) {
-			const errorData = await response.json().catch(() => ({}));
-			throw new Error(errorData.message || "Błąd logowania. Sprawdź dane.");
-		}
-
-		return response.json();
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Błąd logowania. Sprawdź dane.");
+    }
+		const token = await response.text(); 
+		return { token }; 
 	},
 
 	// --- REJESTRACJA ---

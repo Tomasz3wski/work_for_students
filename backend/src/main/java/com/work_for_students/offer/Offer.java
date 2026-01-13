@@ -22,6 +22,7 @@ public class Offer {
     private Long id;
 
     private String title;
+    private String company;
     private String location;
     private String salary;
 
@@ -45,7 +46,7 @@ public class Offer {
     private List<String> customRequirements;
 
 
-    public Offer(String salary, String description, String benefits, OfferType contractType, Boolean remoteWork, List<Requirement> globalRequirements, List<String> customRequirements, String location, String title) {
+    public Offer(String salary, String description, String benefits, OfferType contractType, Boolean remoteWork, List<Requirement> globalRequirements, List<String> customRequirements, String location, String title, String company) {
         this.salary = salary;
         this.description = description;
         this.benefits = benefits;
@@ -55,5 +56,6 @@ public class Offer {
         this.customRequirements = customRequirements;
         this.location = location;
         this.title = title;
+        this.company = company;
     }
 }

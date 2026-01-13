@@ -35,14 +35,25 @@ public class AuthService {
 
     // --- REJESTRACJA ---
     public ResponseEntity<String> registerUser(RegisterRequest request) {
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
+        User user;
+        if(request.getUserRole() == UserRole.STUDENT) {
+            user = User.createStudent(
+                    request.getEmail(),
+                    encodedPassword,
+                    request.getName(),
+                    request.getSurname()
+            );
+        } else{
+            user = User.createEmployer(
+                    request.getEmail(),
+                    encodedPassword,
+                    request.getCompanyName(),
+                    request.getNip()
+            );
+        }
 
-        User newUser = new User();
-        newUser.setEmail(request.getEmail());
-        newUser.setPassword(passwordEncoder.encode(request.getPassword()));
-        newUser.setFullName(request.getFullName());
-        newUser.setRole(UserRole.STUDENT); //TODO front nie wysyla roli w body, zmienic na request.getRole pozniej
-
-        return userService.addNewUser(newUser);
+        return userService.addNewUser(user);
     }
 
     // --- LOGOWANIE ---

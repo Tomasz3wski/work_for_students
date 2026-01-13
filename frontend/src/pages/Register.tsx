@@ -6,9 +6,9 @@ export default function Register() {
 	const navigate = useNavigate();
 
 	const [formData, setFormData] = useState({
-		role: "STUDENT",
-		firstName: "",
-		lastName: "",
+		userRole: "STUDENT",
+		name: "",
+		surname: "",
 		companyName: "",
 		nip: "",
 		email: "",
@@ -38,7 +38,7 @@ export default function Register() {
 		}
 
 		// 2. Walidacja NIP dla pracodawcy
-		if (formData.role === "EMPLOYER") {
+		if (formData.userRole === "EMPLOYER") {
 			const nipRegex = /^\d{10}$/;
 			if (!nipRegex.test(formData.nip)) {
 				setErrorMessage("NIP musi składać się z dokładnie 10 cyfr!");
@@ -52,10 +52,11 @@ export default function Register() {
 			const payload = {
 				email: formData.email,
 				password: formData.password,
-				role: formData.role,
-				...(formData.role === "STUDENT"
-					? { firstName: formData.firstName, lastName: formData.lastName }
-					: { companyName: formData.companyName, nip: formData.nip }),
+				userRole: formData.userRole, 
+				name: formData.name,         
+				surname: formData.surname,  
+				companyName: formData.companyName,
+				nip: formData.nip
 			};
 
 			await authService.register(payload);
@@ -95,12 +96,12 @@ export default function Register() {
 					onSubmit={handleSubmit}>
 					{/* Wybór roli */}
 					<div className='form-group'>
-						<label htmlFor='role'>Kim jesteś?</label>
+						<label htmlFor='userRole'>Kim jesteś?</label>
 						<select
-							id='role'
-							name='role'
+							id='userRole'
+							name='userRole'
 							className='input-field'
-							value={formData.role}
+							value={formData.userRole}
 							onChange={handleInputChange}>
 							<option value='STUDENT'>Student</option>
 							<option value='EMPLOYER'>Pracodawca</option>
@@ -108,29 +109,29 @@ export default function Register() {
 					</div>
 
 					{/* Pola dla STUDENTA */}
-					{formData.role === "STUDENT" && (
+					{formData.userRole === "STUDENT" && (
 						<>
 							<div className='form-group'>
-								<label htmlFor='firstName'>Imię</label>
+								<label htmlFor='name'>Imię</label>
 								<input
-									id='firstName'
+									id='name'
 									type='text'
-									name='firstName'
+									name='name'
 									className='input-field'
-									value={formData.firstName}
+									value={formData.name}
 									onChange={handleInputChange}
 									required
 								/>
 							</div>
 
 							<div className='form-group'>
-								<label htmlFor='lastName'>Nazwisko</label>
+								<label htmlFor='surname'>Nazwisko</label>
 								<input
-									id='lastName'
+									id='surname'
 									type='text'
-									name='lastName'
+									name='surname'
 									className='input-field'
-									value={formData.lastName}
+									value={formData.surname}
 									onChange={handleInputChange}
 									required
 								/>
@@ -139,7 +140,7 @@ export default function Register() {
 					)}
 
 					{/* Pola dla PRACODAWCY */}
-					{formData.role === "EMPLOYER" && (
+					{formData.userRole === "EMPLOYER" && (
 						<>
 							<div className='form-group'>
 								<label htmlFor='companyName'>Nazwa firmy</label>

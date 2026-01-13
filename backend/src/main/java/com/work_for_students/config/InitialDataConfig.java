@@ -44,7 +44,8 @@ public class InitialDataConfig {
                     requirementsOffer1,
                     Arrays.asList("Umiejętność picia kawy", "Chęć nauki"),
                     "Kraków",
-                    "Junior Java/React Dev"
+                    "Junior Java/React Dev",
+                    "TechFirma1"
             );
 
             // --- OFERTA 2 ---
@@ -57,7 +58,8 @@ public class InitialDataConfig {
                     requirementsOffer2,
                     Arrays.asList("umiejetnosc cięcia"),
                     "Gliwice",
-                    "Intern Fullstack Developer"
+                    "Intern Fullstack Developer",
+                    "SoftwareHouse PL"
             );
 
 

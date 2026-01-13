@@ -1,3 +1,8 @@
+export interface BackendRequirement {
+  id: number;
+  name: string;
+}
+
 export interface JobOffer {
   id: number;
   title: string;
@@ -5,7 +10,11 @@ export interface JobOffer {
   location: string;
   salary: string;
   description: string;
-  requirements: string[];
+  globalRequirements: BackendRequirement[];
+  customRequirements: string[];
+  benefits?: string;
+  contractType?: string;
+  remoteWork?: boolean;
 }
 
 export interface AuthCredentials {
