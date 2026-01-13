@@ -1,17 +1,12 @@
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-// @ts-ignore
-
 
 export default function Navbar() {
 	const navigate = useNavigate();
-
 	const isLoggedIn = !!localStorage.getItem("userToken");
-
 
 	const handleLogout = () => {
 		localStorage.removeItem("userToken");
-		window.location.reload();
+		window.location.reload(); // Proste przeładowanie czyści stan
 	};
 
 	return (
@@ -22,14 +17,22 @@ export default function Navbar() {
 				Work For Students
 			</div>
 
-
-			<div className='nav-buttons'>
+			<div className='nav-buttons' style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
 				{isLoggedIn ? (
-					<button
-						className='btn btn-secondary btn-sm'
-						onClick={handleLogout}>
-						Wyloguj
-					</button>
+					<>
+                        <button 
+                            className='btn btn-secondary btn-sm'
+                            onClick={() => navigate("/profile")}
+                            title="Mój Profil"
+                        >
+                            👤 Profil
+                        </button>
+						<button
+							className='btn btn-secondary btn-sm'
+							onClick={handleLogout}>
+							Wyloguj
+						</button>
+					</>
 				) : (
 					<>
 						<button
