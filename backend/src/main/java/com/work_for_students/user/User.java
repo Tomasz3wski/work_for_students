@@ -25,8 +25,11 @@ public class User implements UserDetails {
     private UserRole role;
     private String email;
     private String company;
+    @Column(length = 10)
     private String nip;
-    private String cvLink;
+    private String cvPath;
+    @Column(length = 2000)
+    private String availability;
 
     public User() {
     }
