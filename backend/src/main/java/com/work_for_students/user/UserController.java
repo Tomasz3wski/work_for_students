@@ -2,7 +2,9 @@ package com.work_for_students.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -28,7 +30,13 @@ public class UserController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<?> updateUser(@RequestBody User user) {
-        return userService.updateUser(user);
+    public ResponseEntity<?> updateUser(@RequestPart User user, @RequestPart(value = "file", required = false) MultipartFile file) {
+        return userService.updateUser(user, file);
     }
+    @GetMapping("/me")
+    public ResponseEntity<User> getCurrentUser() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userService.getUserByEmail(email);
+    }
+
 }
