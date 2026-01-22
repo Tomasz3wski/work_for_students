@@ -2,6 +2,7 @@ package com.work_for_students.offer.dto;
 
 import com.work_for_students.offer.OfferType;
 import com.work_for_students.requirements.Requirement;
+import com.work_for_students.user.User;
 import lombok.Getter;
 import lombok.Setter;
 

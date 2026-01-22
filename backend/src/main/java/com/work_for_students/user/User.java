@@ -1,5 +1,8 @@
 package com.work_for_students.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.work_for_students.application.Application;
+import com.work_for_students.offer.Offer;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,6 +33,14 @@ public class User implements UserDetails {
     private String cvPath;
     @Column(length = 2000)
     private String availability;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Application> applications;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "employer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Offer> postedOffers;
 
     public User() {
     }

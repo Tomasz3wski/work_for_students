@@ -1,11 +1,13 @@
 package com.work_for_students.offer;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.work_for_students.application.Application;
 import com.work_for_students.requirements.Requirement;
+import com.work_for_students.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.List;
 
@@ -26,13 +28,21 @@ public class Offer {
     private String location;
     private String salary;
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String description;
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String benefits;
 
     private OfferType contractType;
     private Boolean remoteWork;
+
+    @ManyToOne
+    @JoinColumn(name = "employer_id")
+    private User employer;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "offer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Application> applications;
 
     @ManyToMany
     @JoinTable(

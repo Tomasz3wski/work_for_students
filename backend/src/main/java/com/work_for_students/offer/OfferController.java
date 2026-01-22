@@ -4,6 +4,7 @@ import com.work_for_students.offer.dto.OfferRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,5 +32,11 @@ public class OfferController {
     @PostMapping("/add")
     public ResponseEntity<?> createOffer(@RequestBody OfferRequest request, Authentication authentication) {
         return offerService.saveNewOffer(request, authentication.getName());
+    }
+
+    @GetMapping("/my")
+    public List<Offer> getMyOffers() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        return offerService.getEmployerOffers(email);
     }
 }
