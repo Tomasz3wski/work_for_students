@@ -56,6 +56,8 @@ public class OfferService {
         offer.setBenefits(request.getBenefits());
         offer.setContractType(request.getContractType());
         offer.setRemoteWork(request.getRemoteWork());
+        offer.setWorkHoursStart(request.getWorkHoursStart());
+        offer.setWorkHoursEnd(request.getWorkHoursEnd());
         offer.setGlobalRequirements(request.getGlobalRequirements());
         offer.setCustomRequirements(request.getCustomRequirements());
         offer.setCompany(user.getCompany());

@@ -1,4 +1,3 @@
-// Zmieniamy adres bazowy na właściwy dla ApplicationController
 const API_URL = "http://localhost:8080/applications"; 
 
 export type ApplicationStatus = "NEW" | "VIEWED" | "SEEN"| "ACCEPTED" | "REJECTED";
@@ -20,6 +19,13 @@ export interface JobApplication {
         title: string;
         company: string;
         location: string;
+        employer: {
+            id: number;
+            email: string;
+            company?: string;
+            name?: string;
+            surname?: string;
+        }
     };
 }
 

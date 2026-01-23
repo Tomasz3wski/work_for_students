@@ -1,6 +1,7 @@
 package com.work_for_students.offer;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.work_for_students.application.Application;
 import com.work_for_students.requirements.Requirement;
 import com.work_for_students.user.User;
@@ -36,8 +37,10 @@ public class Offer {
     private OfferType contractType;
     private Boolean remoteWork;
 
-    @ManyToOne
+    // ...
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employer_id")
+    @JsonIgnoreProperties({"postedOffers", "applications", "password", "tokens", "availability", "hibernateLazyInitializer", "handler"})
     private User employer;
 
     @JsonIgnore
@@ -54,7 +57,11 @@ public class Offer {
 
     @ElementCollection
     private List<String> customRequirements;
+    @Column(name = "work_hours_start")
+    private String workHoursStart;
 
+    @Column(name = "work_hours_end")
+    private String workHoursEnd;
 
     public Offer(String salary, String description, String benefits, OfferType contractType, Boolean remoteWork, List<Requirement> globalRequirements, List<String> customRequirements, String location, String title, String company) {
         this.salary = salary;

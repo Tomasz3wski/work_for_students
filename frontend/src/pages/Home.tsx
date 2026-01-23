@@ -4,6 +4,10 @@ import { useNavigate } from "react-router-dom";
 import { offersService } from "../api/offers";
 // @ts-ignore
 import { applicationService, type JobApplication, type ApplicationStatus } from "../api/applications";
+// @ts-ignore
+import { reviewsService, type ReviewsResponse } from "../api/reviews";
+// @ts-ignore
+import { userService, type UserProfile } from "../api/user";
 import type { JobOffer } from "../types";
 
 export default function Home() {
@@ -43,6 +47,15 @@ function EmployerDashboard() {
     // Stan dla funkcji "Cofnij"
     const [undoState, setUndoState] = useState<{ appId: number, prevStatus: ApplicationStatus } | null>(null);
     const undoTimerRef = useRef<number | null>(null);
+
+    // --- STAN DLA MODALA OPINII ---
+    const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+    const [selectedStudentId, setSelectedStudentId] = useState<number | null>(null);
+    const [studentReviews, setStudentReviews] = useState<ReviewsResponse | null>(null);
+    
+    // Formularz nowej opinii
+    const [newRating, setNewRating] = useState(5);
+    const [newComment, setNewComment] = useState("");
 
     // 1. Pobieranie ofert pracodawcy
     useEffect(() => {
@@ -142,6 +155,42 @@ function EmployerDashboard() {
         }
     };
 
+    // --- LOGIKA OPINII ---
+    const handleOpenReviews = async (studentId: number) => {
+        setSelectedStudentId(studentId);
+        setIsReviewModalOpen(true);
+        try {
+            const data = await reviewsService.getUserReviews(studentId);
+            setStudentReviews(data);
+        } catch (e) {
+            console.error("Błąd pobierania opinii", e);
+        }
+    };
+
+    const handleAddReview = async (e: any) => {
+        e.preventDefault();
+        if (!selectedStudentId) return;
+
+        try {
+            await reviewsService.addReview(selectedStudentId, newRating, newComment);
+            alert("Opinia dodana pomyślnie!");
+            
+            // Odśwież listę opinii
+            const updated = await reviewsService.getUserReviews(selectedStudentId);
+            setStudentReviews(updated);
+            
+            // Wyczyść formularz
+            setNewComment("");
+            setNewRating(5);
+        } catch (e) {
+            alert("Wystąpił błąd przy dodawaniu opinii.");
+        }
+    };
+
+    const renderStars = (rating: number) => {
+        return "⭐".repeat(Math.round(rating)) + "☆".repeat(5 - Math.round(rating));
+    };
+
     // --- POMOCNICZE UI ---
     const getInitials = (name: string, surname: string) => {
         return `${name.charAt(0)}${surname.charAt(0)}`.toUpperCase();
@@ -173,7 +222,7 @@ function EmployerDashboard() {
     if (loading) return <div style={{ padding: '50px', textAlign: 'center', color: '#666' }}>Ładowanie panelu...</div>;
 
     return (
-        <div style={{ display: 'flex', height: 'calc(100vh - 64px)', background: '#f9fafb' }}>
+        <div style={{ display: 'flex', height: 'calc(100vh - 64px)', background: '#f9fafb', position: 'relative' }}>
             
             {/* LEWY PANEL: Lista Ofert */}
             <div style={{ width: '350px', background: 'white', borderRight: '1px solid #e5e7eb', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
@@ -251,7 +300,7 @@ function EmployerDashboard() {
                                                     <div>
                                                         {app.status === 'ACCEPTED' && <span style={{ color: '#166534', background: '#dcfce7', padding: '4px 12px', borderRadius: '20px', fontWeight: 'bold', fontSize: '0.8rem' }}>✅ Zaakceptowany</span>}
                                                         {app.status === 'REJECTED' && <span style={{ color: '#991b1b', background: '#fee2e2', padding: '4px 12px', borderRadius: '20px', fontWeight: 'bold', fontSize: '0.8rem' }}>⛔ Odrzucony</span>}
-                                                        {app.status === 'VIEWED' && <span style={{ color: '#854d0e', background: '#fef9c3', padding: '4px 12px', borderRadius: '20px', fontWeight: 'bold', fontSize: '0.8rem' }}>👁️ Wyświetlona</span>}
+                                                        {(app.status === 'SEEN' || app.status === 'VIEWED') && <span style={{ color: '#854d0e', background: '#fef9c3', padding: '4px 12px', borderRadius: '20px', fontWeight: 'bold', fontSize: '0.8rem' }}>👁️ Wyświetlona</span>}
                                                         {app.status === 'NEW' && <span style={{ color: '#1e40af', background: '#dbeafe', padding: '4px 12px', borderRadius: '20px', fontWeight: 'bold', fontSize: '0.8rem' }}>🆕 Nowa</span>}
                                                     </div>
                                                 </div>
@@ -264,8 +313,9 @@ function EmployerDashboard() {
                                                 {/* DOLNA BELKA (CV + AKCJE) */}
                                                 <div style={{ marginTop: '15px', paddingTop: '15px', borderTop: '1px solid #f3f4f6', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                                     
-                                                    {/* PRZYCISK CV */}
+                                                    {/* LEWA STRONA BELKI: CV + OPINIE */}
                                                     <div style={{ display: 'flex', gap: '10px' }}>
+                                                        {/* PRZYCISK CV */}
                                                         {app.student.cvPath ? (
                                                             <button 
                                                                 onClick={() => handleViewCv(app.id)}
@@ -285,9 +335,22 @@ function EmployerDashboard() {
                                                                 ⚠️ Brak CV
                                                             </span>
                                                         )}
+
+                                                        {/* PRZYCISK OPINIE */}
+                                                        <button 
+                                                            onClick={() => handleOpenReviews(app.student.id)}
+                                                            className="btn"
+                                                            style={{ 
+                                                                background: '#fef3c7', color: '#b45309', border: '1px solid #fcd34d', 
+                                                                padding: '6px 12px', borderRadius: '6px', fontSize: '0.85rem', fontWeight: '600',
+                                                                display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer'
+                                                            }}
+                                                        >
+                                                            ⭐ Opinie
+                                                        </button>
                                                     </div>
 
-                                                    {/* PRZYCISKI AKCJI / COFNIJ */}
+                                                    {/* PRAWA STRONA BELKI: PRZYCISKI AKCJI / COFNIJ */}
                                                     <div style={{ display: 'flex', gap: '8px', minWidth: '160px', justifyContent: 'flex-end' }}>
                                                         {isUndoActive ? (
                                                             <button 
@@ -331,34 +394,153 @@ function EmployerDashboard() {
                     </div>
                 )}
             </div>
+
+            {/* --- MODAL Z OPINIAMI --- */}
+            {isReviewModalOpen && selectedStudentId && (
+                <div style={{ 
+                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, 
+                    background: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', 
+                    zIndex: 1000 
+                }}>
+                    <div style={{ 
+                        background: 'white', width: '600px', maxHeight: '90vh', overflowY: 'auto', 
+                        borderRadius: '12px', padding: '30px', position: 'relative', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)'
+                    }}>
+                        {/* Przycisk Zamknij */}
+                        <button 
+                            onClick={() => setIsReviewModalOpen(false)} 
+                            style={{ 
+                                position: 'absolute', top: '15px', right: '15px', border: 'none', 
+                                background: 'transparent', fontSize: '1.5rem', cursor: 'pointer', color: '#6b7280'
+                            }}
+                        >
+                            ×
+                        </button>
+                        
+                        <h2 style={{ marginTop: 0, color: '#111827', fontSize: '1.5rem', borderBottom: '1px solid #e5e7eb', paddingBottom: '15px', marginBottom: '20px' }}>
+                            Profil Studenta
+                        </h2>
+                        
+                        {/* Statystyki Ocen */}
+                        <div style={{ 
+                            display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '25px', 
+                            background: '#fffbeb', padding: '20px', borderRadius: '8px', border: '1px solid #fcd34d'
+                        }}>
+                            <div style={{ fontSize: '3rem', fontWeight: 'bold', color: '#d97706', lineHeight: 1 }}>
+                                {studentReviews?.average ? studentReviews.average.toFixed(1) : "0.0"}
+                            </div>
+                            <div>
+                                <div style={{ color: '#f59e0b', fontSize: '1.2rem', letterSpacing: '2px' }}>
+                                    {renderStars(studentReviews?.average || 0)}
+                                </div>
+                                <div style={{ color: '#92400e', fontSize: '0.9rem', marginTop: '5px', fontWeight: '500' }}>
+                                    Na podstawie {studentReviews?.count || 0} opinii
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Lista Opinii */}
+                        <h3 style={{ fontSize: '1.1rem', color: '#374151', marginBottom: '15px' }}>Opinie pracodawców</h3>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginBottom: '30px', maxHeight: '300px', overflowY: 'auto', paddingRight: '5px' }}>
+                            {studentReviews?.reviews && studentReviews.reviews.length > 0 ? (
+                                studentReviews.reviews.map(rev => (
+                                    <div key={rev.id} style={{ padding: '15px', background: '#f9fafb', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                                            <strong style={{ color: '#1f2937' }}>{rev.reviewerName}</strong>
+                                            <span style={{ fontSize: '0.8rem', color: '#6b7280' }}>{new Date(rev.createdAt).toLocaleDateString()}</span>
+                                        </div>
+                                        <div style={{ color: '#f59e0b', fontSize: '0.9rem', marginBottom: '8px' }}>{renderStars(rev.rating)}</div>
+                                        <p style={{ margin: 0, color: '#1f2937', fontSize: '0.95rem', lineHeight: 1.5 }}>{rev.comment}</p>
+                                    </div>
+                                ))
+                            ) : (
+                                <p style={{ color: '#9ca3af', fontStyle: 'italic', textAlign: 'center', padding: '20px' }}>Brak opinii. Bądź pierwszy!</p>
+                            )}
+                        </div>
+
+                        {/* Formularz dodawania opinii */}
+                        <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: '20px', marginTop: '20px' }}>
+                            <h3 style={{ fontSize: '1.1rem', marginBottom: '15px', color: '#374151' }}>Wystaw opinię</h3>
+                            <form onSubmit={handleAddReview}>
+                                <div style={{ marginBottom: '15px' }}>
+                                    <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.9rem', fontWeight: '600', color: '#4b5563' }}>Ocena</label>
+                                    <select 
+                                        value={newRating} 
+                                        onChange={(e) => setNewRating(Number(e.target.value))}
+                                        style={{ 
+                                            width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #d1d5db', 
+                                            background: '#ffffff', color: '#1f2937', fontSize: '1rem' 
+                                        }}
+                                    >
+                                        <option value="5" style={{color: '#000000'}}>⭐⭐⭐⭐⭐ (5 - Wybitny)</option>
+                                        <option value="4" style={{color: '#000000'}}>⭐⭐⭐⭐ (4 - Dobry)</option>
+                                        <option value="3" style={{color: '#000000'}}>⭐⭐⭐ (3 - Przeciętny)</option>
+                                        <option value="2" style={{color: '#000000'}}>⭐⭐ (2 - Słaby)</option>
+                                        <option value="1" style={{color: '#000000'}}>⭐ (1 - Unikać)</option>
+                                    </select>
+                                </div>
+                                <div style={{ marginBottom: '20px' }}>
+                                    <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.9rem', fontWeight: '600', color: '#4b5563' }}>Komentarz</label>
+                                    <textarea 
+                                        value={newComment} 
+                                        onChange={(e) => setNewComment(e.target.value)}
+                                        placeholder="Jak przebiegła współpraca? Co wyróżnia tego kandydata?"
+                                        required
+                                        style={{ 
+                                            width: '100%', padding: '12px', borderRadius: '6px', border: '1px solid #d1d5db', 
+                                            minHeight: '100px', fontFamily: 'inherit', resize: 'vertical', 
+                                            background: '#ffffff', color: '#1f2937' 
+                                        }}
+                                    />
+                                </div>
+                                <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '12px', fontSize: '1rem', fontWeight: 'bold' }}>
+                                    Dodaj Opinię
+                                </button>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
 
 // ==========================================
-// 🎓 DASHBOARD STUDENTA / GOŚCIA
+// 🎓 DASHBOARD STUDENTA / GOŚCIA (Z MĄDRYM PORÓWNYWANIEM GODZIN)
 // ==========================================
 function StudentDashboard({ navigate, token }: { navigate: any, token: string | null }) {
     const [offers, setOffers] = useState<JobOffer[]>([]);
     const [selectedOffer, setSelectedOffer] = useState<JobOffer | null>(null);
+    const [userProfile, setUserProfile] = useState<UserProfile | null>(null); // Profil studenta
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
   
+    // 1. Pobierz oferty ORAZ profil studenta (żeby znać jego dostępność)
     useEffect(() => {
       const fetchData = async () => {
         try {
           setIsLoading(true);
-          const data = await offersService.getAllOffers();
-          setOffers(data);
-          if (data.length > 0) setSelectedOffer(data[0]);
+          
+          // Pobieramy oferty
+          const offersData = await offersService.getAllOffers();
+          setOffers(offersData);
+          if (offersData.length > 0) setSelectedOffer(offersData[0]);
+
+          // Jeśli zalogowany, pobierz profil (do porównania godzin)
+          if (token) {
+              const userData = await userService.getCurrentUser();
+              setUserProfile(userData);
+          }
+
         } catch (err) {
-          setError("Błąd pobierania ofert. Sprawdź połączenie z backendem.");
+          setError("Błąd pobierania danych.");
         } finally {
           setIsLoading(false);
         }
       };
       fetchData();
-    }, []);
+    }, [token]);
   
     const handleApply = async () => {
       if (!token) {
@@ -375,6 +557,79 @@ function StudentDashboard({ navigate, token }: { navigate: any, token: string | 
       } catch (err: any) {
           alert("❌ Błąd: " + (err.message || "Nie udało się zaaplikować."));
       }
+    };
+
+    // --- LOGIKA PORÓWNYWANIA GODZIN ---
+    const renderTimeMatching = () => {
+        if (!selectedOffer?.workHoursStart || !selectedOffer?.workHoursEnd) {
+            return (
+                <div style={{ background: '#f0f9ff', padding: '15px', borderRadius: '8px', border: '1px solid #bae6fd', marginBottom: '20px' }}>
+                    <span style={{ fontWeight: 'bold', color: '#0284c7' }}>🕒 Godziny pracy: Elastyczne / Nie podano</span>
+                </div>
+            );
+        }
+
+        const offerStart = parseInt(selectedOffer.workHoursStart.replace(":", ""));
+        const offerEnd = parseInt(selectedOffer.workHoursEnd.replace(":", ""));
+
+        // Jeśli nie ma profilu lub dostępności, pokaż tylko wymagania
+        if (!userProfile?.availability) {
+            return (
+                <div style={{ background: '#f3f4f6', padding: '15px', borderRadius: '8px', border: '1px solid #d1d5db', marginBottom: '20px' }}>
+                    <div style={{ fontWeight: 'bold', color: '#374151', marginBottom: '5px' }}>🕒 Wymagane godziny:</div>
+                    <div style={{ fontSize: '1.2rem', color: '#111' }}>{selectedOffer.workHoursStart} - {selectedOffer.workHoursEnd}</div>
+                    <div style={{ fontSize: '0.85rem', color: '#6b7280', marginTop: '5px' }}>Uzupełnij swój profil, aby zobaczyć dopasowanie.</div>
+                </div>
+            );
+        }
+
+        const schedule = JSON.parse(userProfile.availability);
+        
+        return (
+            <div style={{ background: 'white', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '20px', marginBottom: '25px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+                <h3 style={{ margin: '0 0 15px 0', fontSize: '1.1rem', color: '#1f2937' }}>
+                    🕒 Dopasowanie godzin ({selectedOffer.workHoursStart} - {selectedOffer.workHoursEnd})
+                </h3>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '10px' }}>
+                    {Object.entries(schedule).map(([day, val]: any) => {
+                        if (!val.active) return null; // Pomiń dni nieaktywne
+
+                        const studStart = parseInt(val.start.replace(":", ""));
+                        const studEnd = parseInt(val.end.replace(":", ""));
+
+                        // Logika dopasowania:
+                        // 1. Idealne lub szersze: Student zaczyna wcześniej/równo I kończy później/równo
+                        const isFullMatch = studStart <= offerStart && studEnd >= offerEnd;
+                        
+                        // 2. Częściowe: Jakikolwiek overlap
+                        const isPartialMatch = (studStart < offerEnd) && (studEnd > offerStart);
+
+                        let bg = "#fee2e2"; // Czerwony (brak pokrycia lub za mało)
+                        let text = "#991b1b";
+                        let icon = "⚠️";
+
+                        if (isFullMatch) {
+                            bg = "#dcfce7"; text = "#166534"; icon = "✅";
+                        } else if (isPartialMatch) {
+                            bg = "#fef9c3"; text = "#854d0e"; icon = "⚠️ Częściowo";
+                        }
+
+                        return (
+                            <div key={day} style={{ background: bg, color: text, padding: '10px', borderRadius: '8px', fontSize: '0.85rem', border: `1px solid ${text}40` }}>
+                                <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>{day.substring(0, 3)}</div>
+                                <div>{val.start} - {val.end}</div>
+                                <div style={{ marginTop: '5px', fontWeight: 'bold' }}>{icon}</div>
+                            </div>
+                        );
+                    })}
+                </div>
+                {/* Legenda/Info */}
+                <div style={{ fontSize: '0.8rem', color: '#6b7280', marginTop: '10px', fontStyle: 'italic' }}>
+                    Porównano Twoją dostępność z wymaganiami oferty.
+                </div>
+            </div>
+        );
     };
   
     if (isLoading) return <div style={{padding: '40px', textAlign: 'center'}}>Ładowanie ofert...</div>;
@@ -398,6 +653,12 @@ function StudentDashboard({ navigate, token }: { navigate: any, token: string | 
                 <div className="offer-meta">
                   {offer.location} • <span className="salary-text">{offer.salary}</span>
                 </div>
+                {/* Mały podgląd godzin na liście */}
+                {offer.workHoursStart && (
+                    <div style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '4px' }}>
+                        🕒 {offer.workHoursStart} - {offer.workHoursEnd}
+                    </div>
+                )}
               </div>
             ))
           )}
@@ -424,6 +685,9 @@ function StudentDashboard({ navigate, token }: { navigate: any, token: string | 
               <hr className="divider" />
   
               <article className="details-body">
+                {/* --- SEKCJA DOPASOWANIA GODZIN --- */}
+                {renderTimeMatching()}
+
                 <h3>Opis stanowiska</h3>
                 <p>{selectedOffer.description}</p>
                 

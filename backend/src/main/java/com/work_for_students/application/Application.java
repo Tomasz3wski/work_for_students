@@ -35,7 +35,7 @@ public class Application {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "offer_id")
-    @JsonIgnoreProperties({"applications", "employer", "requirements"})
+    @JsonIgnoreProperties({"applications", "requirements", "hibernateLazyInitializer", "handler"})
     private Offer offer;
 
 

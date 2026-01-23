@@ -20,4 +20,6 @@ public class OfferRequest {
     Boolean remoteWork;
     List<Requirement> globalRequirements;
     List<String> customRequirements;
+    private String workHoursStart;
+    private String workHoursEnd;
 }

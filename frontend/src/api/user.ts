@@ -4,7 +4,7 @@ const API_URL = "http://localhost:8080/users";
 export interface UserProfile {
     id: number;
     email: string;
-    role: "STUDENT" | "EMPLOYER";
+    role: "STUDENT" | "EMPLOYER" | "ADMIN";
     name?: string;
     surname?: string;
     company?: string;

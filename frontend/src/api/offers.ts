@@ -31,7 +31,6 @@ export const offersService = {
   },
 
   // 2. Pobieranie ofert TYLKO zalogowanego pracodawcy
-  // To rozwiąże problem "nie ma żadnej tutaj"
   getMyOffers: async (): Promise<JobOffer[]> => {
     const token = localStorage.getItem("userToken");
 
@@ -39,12 +38,11 @@ export const offersService = {
         throw new Error("Musisz być zalogowany, aby zobaczyć swoje oferty.");
     }
 
-    // Endpoint musi pasować do tego w OfferController (/offers/my)
     const response = await fetch(`${API_URL}/my`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}` // Tu wysyłamy token!
+            "Authorization": `Bearer ${token}`
         }
     });
 
@@ -52,5 +50,47 @@ export const offersService = {
         throw new Error("Błąd pobierania twoich ofert.");
     }
     return response.json();
+  },
+
+  // 3. Tworzenie nowej oferty
+  createOffer: async (offerData: any) => {
+      const token = localStorage.getItem("userToken");
+      const response = await fetch(`${API_URL}/add`, {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`
+          },
+          body: JSON.stringify(offerData)
+      });
+
+      if (!response.ok) {
+          const text = await response.text();
+          throw new Error(text || "Nie udało się utworzyć oferty.");
+      }
+      return response.text();
+  },
+
+  // 4. Pobieranie typów ofert (ENUM z backendu) - NOWE
+  getOfferTypes: async (): Promise<string[]> => {
+      const token = localStorage.getItem("userToken");
+      const headers: HeadersInit = {
+          "Content-Type": "application/json"
+      };
+      
+      // Dodajemy token na wypadek, gdyby endpoint był zabezpieczony
+      if (token) {
+          headers["Authorization"] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(`${API_URL}/types`, {
+          method: "GET",
+          headers: headers
+      });
+
+      if (!response.ok) {
+          throw new Error("Nie udało się pobrać typów ofert.");
+      }
+      return response.json();
   }
 };
