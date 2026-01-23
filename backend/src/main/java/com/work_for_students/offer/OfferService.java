@@ -56,13 +56,22 @@ public class OfferService {
         offer.setBenefits(request.getBenefits());
         offer.setContractType(request.getContractType());
         offer.setRemoteWork(request.getRemoteWork());
+        offer.setWorkHoursStart(request.getWorkHoursStart());
+        offer.setWorkHoursEnd(request.getWorkHoursEnd());
         offer.setGlobalRequirements(request.getGlobalRequirements());
         offer.setCustomRequirements(request.getCustomRequirements());
         offer.setCompany(user.getCompany());
+        offer.setEmployer(user);
 
         offerRepository.save(offer);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body("Oferta firmy została pomyślnie utworzona." + user.getCompany() + " " +user.getEmail());
+                .body("Oferta firmy została pomyślnie utworzona.");
+    }
+
+    public List<Offer> getEmployerOffers(String email) {
+        User employer = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Pracodawca nie znaleziony"));
+        return offerRepository.findAllByEmployer(employer);
     }
 }

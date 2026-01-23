@@ -1,11 +1,14 @@
 package com.work_for_students.offer;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.work_for_students.application.Application;
 import com.work_for_students.requirements.Requirement;
+import com.work_for_students.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.List;
 
@@ -26,13 +29,23 @@ public class Offer {
     private String location;
     private String salary;
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String description;
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String benefits;
 
     private OfferType contractType;
     private Boolean remoteWork;
+
+    // ...
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "employer_id")
+    @JsonIgnoreProperties({"postedOffers", "applications", "password", "tokens", "availability", "hibernateLazyInitializer", "handler"})
+    private User employer;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "offer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Application> applications;
 
     @ManyToMany
     @JoinTable(
@@ -44,7 +57,11 @@ public class Offer {
 
     @ElementCollection
     private List<String> customRequirements;
+    @Column(name = "work_hours_start")
+    private String workHoursStart;
 
+    @Column(name = "work_hours_end")
+    private String workHoursEnd;
 
     public Offer(String salary, String description, String benefits, OfferType contractType, Boolean remoteWork, List<Requirement> globalRequirements, List<String> customRequirements, String location, String title, String company) {
         this.salary = salary;

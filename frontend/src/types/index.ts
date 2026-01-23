@@ -10,11 +10,14 @@ export interface JobOffer {
   location: string;
   salary: string;
   description: string;
-  globalRequirements: BackendRequirement[];
-  customRequirements: string[];
   benefits?: string;
-  contractType?: string;
-  remoteWork?: boolean;
+  contractType: string;
+  remoteWork: boolean;
+  globalRequirements?: { id: number; name: string }[];
+  customRequirements?: string[];
+  // NOWE POLA
+  workHoursStart?: string;
+  workHoursEnd?: string;
 }
 
 export interface AuthCredentials {
