@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -48,8 +49,29 @@ public class UserService {
         return ResponseEntity.ok("Dodano");
     }
 
+
     private boolean checkIfStudent(String email) {
-        return true;//TODO: sprawdzanie czy mail jest studencki w przypadku studenta
+        if (email == null || !email.contains("@")) {
+            return false;
+        }
+
+        // Mini "baza" akceptowalnych końcówek
+        List<String> studentDomains = Arrays.asList(
+                "@student.uw.edu.pl",
+                "@student.pwr.edu.pl",
+                "@student.uj.edu.pl",
+                "@edu.pl",
+                "@student.agh.edu.pl",
+                "@student.polsl.pl"
+        );
+
+        for (String domain : studentDomains) {
+            if (email.toLowerCase().endsWith(domain)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private boolean isValidEmail(String email) {
